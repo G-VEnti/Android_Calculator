@@ -16,12 +16,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -99,6 +105,45 @@ fun GreetingPreview() {
 //    }
 //}
 
+val buttonList = listOf(
+    "<-", "C", "%", "/",
+    "7", "8", "9", "*",
+    "4", "5", "6", "-",
+    "1", "2", "3", "+",
+    "0", ".", "="
+)
+
+@Composable
+fun CalcButton(btn: String, onDigitClick: (String) -> Unit){
+    LargeFloatingActionButton(
+        modifier = Modifier.fillMaxSize().padding(3.dp),
+        onClick = { onDigitClick(btn) },
+        contentColor = Color.White,
+        containerColor = GetColor(btn),
+    ){
+        Text(
+            text = btn,
+            fontSize = 36.sp)
+    }
+}
+
+fun GetColor(btn: String) : Color{
+    if (btn == "<-" ||
+        btn == "C" ||
+        btn == "%" ||
+        btn == "/" ||
+        btn == "*" ||
+        btn == "-" ||
+        btn == "+"){
+        return Color(0xFF3EAD89)
+    }
+    else if (btn == "="){
+        return Color(0xFF79FF12)
+    }
+    else{
+        return Color(0xFF787878)
+    }
+}
 
 @Composable
 fun CalculatorScreen(
@@ -108,16 +153,19 @@ fun CalculatorScreen(
 ) {
     Box(
         modifier.fillMaxSize().background(Color.Black)
-    )
-    Column(modifier = modifier.fillMaxSize().padding(8.dp)) {
-        OutlinedTextField(
-            value = display,
-            onValueChange = {},
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            textStyle = TextStyle(textAlign = TextAlign.End, fontSize = 36.sp, color = Color.White),
-
-        )
+    ) {
+        Column(modifier = modifier.fillMaxSize().padding(8.dp)) {
+            OutlinedTextField(
+                value = display,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                textStyle = TextStyle(
+                    textAlign = TextAlign.End,
+                    fontSize = 36.sp,
+                    color = Color.White
+                )
+            )
 //        Button(
 //            onClick = { onDigitClick("1") },
 //            modifier = Modifier.weight(1f).fillMaxSize(),
@@ -127,91 +175,131 @@ fun CalculatorScreen(
 //                Text("1", fontSize = 30.sp)
 //            }
 //        }
-        val btnHeight : Int = 95
-        val btnPadding : Int = 4
-        val btnTextSize : Int = 30
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(count = 4),
-            modifier = Modifier.fillMaxSize().padding(10.dp)
-        ) {
-            var btnText : Int = 9
-            for (i in 1..19) {
-                if (i != 17) {
-                    item {
-                        when (i) {
-                            1 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = {},
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-                            ) { Text(text = "<-", fontSize = btnTextSize.sp) }
-
-                            2 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = {},
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-                            ) { Text(text = "C", fontSize = btnTextSize.sp) }
-
-                            3 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick("%") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-                            ) { Text(text = "%", fontSize = btnTextSize.sp) }
-
-                            4 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick("/") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.hsl(166.0f, 1.0f, 0.2f))
-                            ) { Text(text = "/", fontSize = btnTextSize.sp) }
-
-                            8 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick("*") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.hsl(166.0f, 1.0f, 0.2f))
-                            ) { Text(text = "*", fontSize = btnTextSize.sp) }
-
-                            12 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick("-") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.hsl(166.0f, 1.0f, 0.2f))
-                            ) { Text(text = "-", fontSize = btnTextSize.sp) }
-
-                            16 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick("+") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.hsl(166.0f, 1.0f, 0.2f))
-                            ) { Text(text = "+", fontSize = btnTextSize.sp) }
-
-                            18 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick(".") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-                            ) { Text(text = ".", fontSize = btnTextSize.sp) }
-
-                            19 -> Button(
-                                modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                onClick = { onDigitClick("%") },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.hsl(94.0f, 0.89f, 0.58f)),
-                            ) { Text(text = "=", fontSize = btnTextSize.sp) }
-
-                            else -> {
-                                val currentNum : Int = btnText
-                                Button(
-                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                                    onClick = { onDigitClick("$currentNum") },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
-                                ) { Text(text = "$btnText", fontSize = btnTextSize.sp) }
-                                btnText--
-                            }
-                        }
+            val btnHeight: Int = 95
+            val btnPadding: Int = 4
+            val btnTextSize: Int = 30
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(count = 4),
+                modifier = Modifier.fillMaxSize().padding(10.dp)
+            ) {
+                items(buttonList,
+                    span = { index ->
+                        val zeroChar : Boolean = (index == "0")
+                        if (zeroChar) { GridItemSpan(2)}
+                        else {GridItemSpan(1)}
                     }
+                ){
+                    CalcButton(it, onDigitClick)
                 }
-                else item (span = {GridItemSpan(currentLineSpan = 2) }) {
-                    Button(
-                        modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
-                    ) { Text(text = "$btnText", fontSize = btnTextSize.sp) }
-                }
+//                var btnText: Int = 9
+//                for (i in 1..19) {
+//                    if (i != 17) {
+//                        item {
+//                            when (i) {
+//                                1 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = {},
+//                                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+//                                ) { Text(text = "<-", fontSize = btnTextSize.sp) }
+//
+//                                2 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = {},
+//                                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+//                                ) { Text(text = "C", fontSize = btnTextSize.sp) }
+//
+//                                3 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick("%") },
+//                                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+//                                ) { Text(text = "%", fontSize = btnTextSize.sp) }
+//
+//                                4 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick("/") },
+//                                    colors = ButtonDefaults.buttonColors(
+//                                        containerColor = Color.hsl(
+//                                            166.0f,
+//                                            1.0f,
+//                                            0.2f
+//                                        )
+//                                    )
+//                                ) { Text(text = "/", fontSize = btnTextSize.sp) }
+//
+//                                8 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick("*") },
+//                                    colors = ButtonDefaults.buttonColors(
+//                                        containerColor = Color.hsl(
+//                                            166.0f,
+//                                            1.0f,
+//                                            0.2f
+//                                        )
+//                                    )
+//                                ) { Text(text = "*", fontSize = btnTextSize.sp) }
+//
+//                                12 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick("-") },
+//                                    colors = ButtonDefaults.buttonColors(
+//                                        containerColor = Color.hsl(
+//                                            166.0f,
+//                                            1.0f,
+//                                            0.2f
+//                                        )
+//                                    )
+//                                ) { Text(text = "-", fontSize = btnTextSize.sp) }
+//
+//                                16 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick("+") },
+//                                    colors = ButtonDefaults.buttonColors(
+//                                        containerColor = Color.hsl(
+//                                            166.0f,
+//                                            1.0f,
+//                                            0.2f
+//                                        )
+//                                    )
+//                                ) { Text(text = "+", fontSize = btnTextSize.sp) }
+//
+//                                18 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick(".") },
+//                                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+//                                ) { Text(text = ".", fontSize = btnTextSize.sp) }
+//
+//                                19 -> Button(
+//                                    modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                                    onClick = { onDigitClick("%") },
+//                                    colors = ButtonDefaults.buttonColors(
+//                                        containerColor = Color.hsl(
+//                                            94.0f,
+//                                            0.89f,
+//                                            0.58f
+//                                        )
+//                                    ),
+//                                ) { Text(text = "=", fontSize = btnTextSize.sp) }
+//
+//                                else -> {
+//                                    val currentNum: Int = btnText
+//                                    Button(
+//                                        modifier = Modifier.height(btnHeight.dp)
+//                                            .padding(btnPadding.dp),
+//                                        onClick = { onDigitClick("$currentNum") },
+//                                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+//                                    ) { Text(text = "$btnText", fontSize = btnTextSize.sp) }
+//                                    btnText--
+//                                }
+//                            }
+//                        }
+//                    } else item(span = { GridItemSpan(currentLineSpan = 2) }) {
+//                        Button(
+//                            modifier = Modifier.height(btnHeight.dp).padding(btnPadding.dp),
+//                            onClick = {},
+//                            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+//                        ) { Text(text = "$btnText", fontSize = btnTextSize.sp) }
+//                    }
+//                }
             }
         }
     }
@@ -308,3 +396,4 @@ fun CalculatorScreen(
 //        }
 //    }
 //}
+

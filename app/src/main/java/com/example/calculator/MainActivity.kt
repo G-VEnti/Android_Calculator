@@ -65,6 +65,21 @@ class MainActivity : ComponentActivity() {
         resetOnNextDigit = false
     }
 
+    private fun clearDisplay() {
+        display = ""
+        currentValue = 0
+        resetOnNextDigit = false
+    }
+
+//    private fun onClickEqual(display: String) {
+//        val figureList = display.split('+','-','*','/','%')
+//    }
+
+    private fun onClickOperate(display: String){
+        val firstFigure: String = display
+        clearDisplay()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -73,7 +88,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CalculatorScreen(
                         display = display,
-                        onDigitClick = { appendDigit(it) },
+                        onDigitClick = { GetButtonFunc(it,{ appendDigit(it) },
+                            { clearDisplay() },
+                            { onClickOperate(display) }) },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -124,6 +141,17 @@ fun CalcButton(btn: String, onDigitClick: (String) -> Unit){
         Text(
             text = btn,
             fontSize = 36.sp)
+    }
+}
+
+fun GetButtonFunc(btn: String,
+                  appendDigit: (String) -> Unit,
+                  clearDisplay: () -> Unit,
+                  onClickOperate:() -> Unit){
+    when (btn) {
+        "C" -> clearDisplay()
+        "+" -> onClickOperate()
+        else -> appendDigit(btn)
     }
 }
 

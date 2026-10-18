@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,33 +52,55 @@ class MainActivity : ComponentActivity() {
         ADD, SUB, MULT, DIV, NONE
     }
     private var display by mutableStateOf("0")
-    private var currentValue = 0
+    private var currentValue = 0.0
     private var resetOnNextDigit = false
+    private var currentOperation = Operation.NONE
+    private var firstNum = 0.0
 
     private fun appendDigit(digit: String) {
-        val newDisplay = if (currentValue == 0 || resetOnNextDigit) {
+        val newDisplay = if (currentValue == 0.0 || resetOnNextDigit) {
             digit
         }else {
             if (digit != "0" || display.isNotEmpty()) display + digit else display
         }
-        currentValue = newDisplay.toIntOrNull() ?: 0
+        currentValue = newDisplay.toDoubleOrNull() ?: 0.0
         display = newDisplay
         resetOnNextDigit = false
     }
 
     private fun clearDisplay() {
-        display = ""
-        currentValue = 0
-        resetOnNextDigit = false
+        display = "0"
+        currentValue = 0.0
+        resetOnNextDigit = true
     }
 
-//    private fun onClickEqual(display: String) {
-//        val figureList = display.split('+','-','*','/','%')
-//    }
+    private fun onClickOperate(operator: String){
+        firstNum = display.toDoubleOrNull() ?: 0.0
 
-    private fun onClickOperate(display: String){
-        val firstFigure: String = display
+        currentOperation = when (operator) {
+            "+" -> Operation.ADD
+            "-" -> Operation.SUB
+            "*" -> Operation.MULT
+            "/" -> Operation.DIV
+            else -> Operation.NONE
+        }
         clearDisplay()
+    }
+
+    private fun onEqual() {
+        val secondNum = display.toDoubleOrNull() ?: 0.0
+
+        val result = when (currentOperation){
+            Operation.ADD -> firstNum + secondNum
+            Operation.SUB -> firstNum - secondNum
+            Operation.MULT -> firstNum * secondNum
+            Operation.DIV -> firstNum / secondNum
+            else -> secondNum
+        }
+        display = result.toString()
+
+        currentOperation = Operation.NONE
+        resetOnNextDigit = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,9 +111,14 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CalculatorScreen(
                         display = display,
-                        onDigitClick = { GetButtonFunc(it,{ appendDigit(it) },
-                            { clearDisplay() },
-                            { onClickOperate(display) }) },
+                        onDigitClick = {
+                            when (it) {
+                            "C" -> clearDisplay()
+                            "+", "-", "*", "/" -> onClickOperate(it)
+                            "=" -> onEqual()
+                            else -> appendDigit(it)
+                            }
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -144,16 +172,18 @@ fun CalcButton(btn: String, onDigitClick: (String) -> Unit){
     }
 }
 
-fun GetButtonFunc(btn: String,
-                  appendDigit: (String) -> Unit,
-                  clearDisplay: () -> Unit,
-                  onClickOperate:() -> Unit){
-    when (btn) {
-        "C" -> clearDisplay()
-        "+" -> onClickOperate()
-        else -> appendDigit(btn)
-    }
-}
+//fun GetButtonFunc(btn: String,
+//                  appendDigit: (String) -> Unit,
+//                  clearDisplay: () -> Unit,
+//                  onClickOperate:(btn: String) -> Unit,
+//                  onEquals: () -> Unit){
+//    when (btn) {
+//        "C" -> clearDisplay()
+//        "+", "-", "*", "/" -> onClickOperate(btn)
+//        "=" -> onEquals()
+//        else -> appendDigit(btn)
+//    }
+//}
 
 fun GetColor(btn: String) : Color{
     if (btn == "<-" ||
@@ -190,25 +220,18 @@ fun CalculatorScreen(
                 readOnly = true,
                 textStyle = TextStyle(
                     textAlign = TextAlign.End,
-                    fontSize = 36.sp,
+                    fontSize = 50.sp,
                     color = Color.White
                 )
             )
-//        Button(
-//            onClick = { onDigitClick("1") },
-//            modifier = Modifier.weight(1f).fillMaxSize(),
-//            contentPadding = PaddingValues(0.dp)
-//        ) {
-//            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                Text("1", fontSize = 30.sp)
-//            }
-//        }
+            Spacer(modifier = Modifier.weight(1f))
+
             val btnHeight: Int = 95
             val btnPadding: Int = 4
             val btnTextSize: Int = 30
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 4),
-                modifier = Modifier.fillMaxSize().padding(10.dp)
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
             ) {
                 items(buttonList,
                     span = { index ->
